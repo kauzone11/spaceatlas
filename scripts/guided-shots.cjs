@@ -10,7 +10,7 @@ const URL = process.env.URL || 'http://localhost:4173/local.html', OUT = process
     p.on('console', m => { if (m.type() === 'error') errs.push(tag + ' ' + m.text()); }); p.on('pageerror', e => errs.push(tag + ' PAGEERR ' + e.message));
     const shot = async (n, full) => { await p.waitForTimeout(1200); await p.screenshot({ path: `${OUT}/${tag}-${n}.png`, fullPage: !!full }); };
     await p.goto(URL); await p.waitForTimeout(1500); await p.click('#lang button:has-text("PT")');
-    await p.click('#play-solo'); await p.click('#crew-enter'); await p.click('#mission-select'); await p.waitForSelector('#question');
+    await p.click('#play-solo'); await p.click('#crew-sofia'); await p.click('#crew-enter'); await p.click('#mission-select'); await p.waitForSelector('#question');
     await shot('01objective');
     await p.click('#q-next'); await shot('02ambition');
     await p.click('#q-next'); await p.click('#inst-tir'); await shot('03instruments');

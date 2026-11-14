@@ -9,8 +9,8 @@ tex = {
  'moon': jpg(Image.open(f'{R}/moon.tif').resize((2048, 1024), Image.LANCZOS), 78),
  'mars': jpg(Image.open(f'{R}/mars.jpg'), 82),
 }
-crops = {'ochoa': ('jsc2014e037863.jpg', .50, .30, .24), 'ride': ('S84-37256.jpg', .50, .33, .27), 'koch': ('jsc2018e095073_alt.jpg', .52, .20, .19),
-         'watkins': ('jsc2026e035015_alt.jpg', .51, .125, .10), 'jemison': ('S92-40463.jpg', .5, .3, .25), 'chang': ('S97-06573.jpg', .5, .3, .25)}
+# mentors of the three playable crew members (src/data/crew.ts)
+crops = {'ochoa': ('jsc2014e037863.jpg', .50, .30, .24), 'watkins': ('jsc2026e035015_alt.jpg', .51, .125, .10), 'chang': ('S97-06573.jpg', .5, .3, .25)}
 por = {}
 for k, (f, cx, cy, h) in crops.items():
     im = Image.open(f'{R}/p/{f}').convert('RGB'); w, hh = im.size; x, y, r = cx * w, cy * hh, h * w

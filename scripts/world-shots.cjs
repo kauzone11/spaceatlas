@@ -8,7 +8,7 @@ const URL = process.env.URL || 'http://localhost:4173/local.html', OUT = process
   p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); }); p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
   await p.goto(URL); await p.waitForTimeout(3500); await p.click('#lang button:has-text("PT")');
   await p.screenshot({ path: `${OUT}/${VP}-home.png` });
-  await p.click('#play-solo'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.waitForSelector('#mission-select');
+  await p.click('#play-solo'); await p.click('#crew-sofia'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.waitForSelector('#mission-select');
   for (const m of ['leo', 'moon', 'neo', 'mars']) {
     await p.click('#mission-' + m); if (await p.$('#unlock-all')) await p.click('#unlock-all'); await p.waitForTimeout(2600);
     await p.screenshot({ path: `${OUT}/${VP}-missions-${m}.png` });

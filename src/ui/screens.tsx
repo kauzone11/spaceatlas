@@ -3,18 +3,18 @@ import { t, fmt, fmtDate, getLang } from '../i18n';
 import { MISSION, MISSIONS, MissionId, Difficulty, ROLES, Role } from '../engine/catalog';
 import { evaluate, defaultDesign, lightTimeS, solarFlux } from '../engine/engine';
 import { CREW_BY_ID, MENTOR } from '../data/crew';
-import { PORTRAIT } from '../data/assets';
 import { roomAvailable } from '../net/room';
-import { app, act, drawCrew, goLocal, startSolo, enterRoom, randomCode, isHost, myRole, canEdit, unlocked, unlockAll, sendChat, derived, crewPerks, quit } from './store';
+import { app, act, goLocal, startSolo, enterRoom, randomCode, isHost, myRole, canEdit, unlocked, unlockAll, sendChat, derived, crewPerks, quit } from './store';
 import { Btn, Seg, Chip, Icon, cx, crewName, eonetTargets, neoTarget, objKeyOf, NasaNow } from './common';
 import { decodeDesign } from '../engine/codec';
 import { sfx, startDrone } from './audio';
+import { CrewPicker } from './crew';
 
 let pendingMode: 'solo' | 'team' = 'solo', pendingCode: string | undefined;
 
 export function Home() {
   const [code, setCode] = useState(''); const [bad, setBad] = useState(false);
-  const go = (mode: 'solo' | 'team', c?: string) => { pendingMode = mode; pendingCode = c; startDrone(); if (!app.crew) drawCrew(); goLocal('crew'); };
+  const go = (mode: 'solo' | 'team', c?: string) => { pendingMode = mode; pendingCode = c; startDrone(); goLocal('crew'); };
   return <div class="wrap"><div class="home enter">
     <div><h1 class="h-xl">{t('app.name')}</h1><div class="sub">{t('app.sub')}</div></div>
     <p class="lead" style="font-size:21px;color:var(--ink)">{t('app.tag')}</p>
@@ -35,46 +35,8 @@ export function Home() {
 }
 
 export function CrewDraft() {
-  const [drawing, setDrawing] = useState(true);
-  useEffect(() => { const id = setTimeout(() => { setDrawing(false); sfx.select(); }, 900); return () => clearTimeout(id); }, [app.crew]);
-  const c = CREW_BY_ID[app.crew!], m = MENTOR[c.mentor], lang = getLang();
-  const initials = c.name.split(' ').map(s => s[0]).join('');
-  return <div class="wrap col enter crewwrap">
-    <div><h1 class="h-l">{t('crew.title')}</h1><p class="lead">{t('crew.sub')}</p></div>
-    {drawing ? <div class="panel crewcard drawing"><span class="h-m mut">{t('crew.draw')}</span></div> :
-      <div class="panel crewcard" key={c.id}>
-        <div class="who">
-          <div class="row" style="gap:18px;flex-wrap:nowrap">
-            <div class="avatar" style={`--h:${c.hue}`} aria-hidden="true">{initials}</div>
-            <div style="min-width:0"><h2 class="h-l" id="crew-name" style="font-size:34px">{c.name}</h2>
-              <p class="mut">{c.pronouns[lang]} · {c.age} · {c.from}</p></div>
-          </div>
-          <p class="spec">{t(`crew.${c.id}.spec`)}</p>
-          <p class="small mut">{c.edu} · {t('crew.fict')}</p>
-          <div class="stationbox">
-            <p><span class="mut">{t('crew.station')}</span> <b>{t('role.' + c.role)}</b></p>
-            <p class="small mut">{t(`role.${c.role}.d`)}</p>
-            <p class="small"><span class="mut">{t('crew.perk')}</span> <b style="color:var(--cyan)">{t('perk.' + c.role)}</b></p>
-          </div>
-          {pendingMode === 'solo' && <p class="small dim">{t('crew.solo')}</p>}
-        </div>
-        <div class="insp">
-          <div class="row" style="gap:14px;flex-wrap:nowrap">
-            <img src={PORTRAIT[c.mentor]} alt={m.name} width="72" height="72" />
-            <div style="min-width:0"><p>{t('crew.mentor')} <b id="crew-inspired">{m.name}</b></p><p class="small dim">{t('crew.mentorsub')} · {t('crew.photo')} {m.nasaId}</p></div>
-          </div>
-          <p class="link">{t(`crew.${c.id}.link`)}</p>
-          <ul class="facts"><li>{t(`mentor.${c.mentor}.f1`)}</li><li>{t(`mentor.${c.mentor}.f2`)}</li></ul>
-        </div>
-      </div>}
-    <div class="row">
-      <Btn kind="ghost" onClick={() => goLocal('home')}>{t('nav.back')}</Btn>
-      <Btn kind="ghost" id="reroll" disabled={app.rerolls < 1 || drawing} onClick={() => { app.rerolls--; setDrawing(true); drawCrew(); }}>{t('crew.reroll')}</Btn>
-      {app.rerolls > 0 && <span class="small dim">{t('crew.rerollleft', { n: app.rerolls })}</span>}
-      <span style="flex:1" />
-      <Btn big id="crew-enter" disabled={drawing} sound="select" onClick={() => { if (pendingMode === 'solo') startSolo(pendingCode); else { app.mode = 'team'; app.net = 'off'; app.g.screen = 'lobby'; goLocal(null); } }}>{t('crew.enter')}</Btn>
-    </div>
-  </div>;
+  return <CrewPicker solo={pendingMode === 'solo'} onBack={() => goLocal('home')}
+    onEnter={() => { if (pendingMode === 'solo') startSolo(pendingCode); else { app.mode = 'team'; app.net = 'off'; app.g.screen = 'lobby'; goLocal(null); } }} />;
 }
 
 export function Chat() {

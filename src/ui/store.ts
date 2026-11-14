@@ -21,7 +21,7 @@ export interface Shared {
 }
 export interface Progress { unlocked: number; all: boolean; best: Partial<Record<MissionId, { verdict: string; sci: number }>> }
 export interface App {
-  lang: Lang; sound: boolean; local: 'home' | 'crew' | null; crew: string | null; rerolls: number;
+  lang: Lang; sound: boolean; local: 'home' | 'crew' | null; crew: string | null;
   mode: 'solo' | 'team'; net: 'off' | 'connecting' | 'on' | 'lost' | 'unavailable'; code: string | null; me: string; peers: NetPeer[];
   g: Shared; tab: Role; progress: Progress;
   /** Guided build: current question (GUIDED.length = summary), the mission it belongs to, */
@@ -41,9 +41,9 @@ const emptySeats = (): Record<Role, Seat | null> => ({ sys: null, sc: null, sci:
 const emptyVotes = (): Record<Role, Vote | null> => ({ sys: null, sc: null, sci: null, ops: null });
 const newShared = (host: string, screen: Screen): Shared => ({ v: 1, host, screen, design: defaultDesign('leo', 'engineer'), seats: emptySeats(), votes: emptyVotes(), forced: false, picks: {}, shown: 0, flight: 1 });
 
-const storedLang = loadStr('sa.lang') as Lang | null;
+const storedLang = loadStr('sa.lang') as Lang | null, storedCrew = loadStr('sa.crew');
 export const app: App = {
-  lang: storedLang && ['en', 'pt', 'es'].includes(storedLang) ? storedLang : 'en', sound: loadStr('sa.sound') !== '0', local: 'home', crew: null, rerolls: 1,
+  lang: storedLang && ['en', 'pt', 'es'].includes(storedLang) ? storedLang : 'en', sound: loadStr('sa.sound') !== '0', local: 'home', crew: storedCrew && CREW_BY_ID[storedCrew] ? storedCrew : null,
   mode: 'solo', net: 'off', code: null, me: 'solo', peers: [], g: newShared('solo', 'missions'), tab: 'sys', step: 0, stepFor: '',
   progress: load<Progress>('sa.progress', { unlocked: 0, all: false, best: {} }), toast: null, chat: [], modal: null,
 };
@@ -72,12 +72,19 @@ export function toast(msg: string) { app.toast = msg; notify(); setTimeout(() =>
 // ---------- local actions ----------
 export function chooseLang(l: Lang) { app.lang = l; setLang(l); save('sa.lang', l); notify(); }
 export function toggleSound() { app.sound = !app.sound; setSound(app.sound); save('sa.sound', app.sound ? '1' : '0'); notify(); }
-export function drawCrew(seed = Math.random()) {
-  const taken = new Set(app.peers.filter(p => !p.isMe).map(p => p.presence.crew as string));
-  const pool = CREW.filter(c => c.id !== app.crew && !taken.has(c.id));
-  app.crew = (pool.length ? pool : CREW)[Math.floor(seed * (pool.length || CREW.length))].id;
+/** The player picks their astronaut on the crew screen; the choice is remembered for the next visit. */
+export function chooseCrew(id: string) {
+  if (!CREW_BY_ID[id]) return;
+  app.crew = id; save('sa.crew', id);
   net?.presence({ crew: app.crew });
   notify();
+}
+/** Crew members other players in the room have picked (picks may repeat: there are 3 characters for 4 seats). */
+export const teammateCrew = () => new Set(app.peers.filter(p => !p.isMe).map(p => p.presence.crew as string));
+/** Used when a shared design link skips the crew screen: pick someone not already in the room. */
+export function drawCrew(seed = Math.random()) {
+  const taken = teammateCrew(), pool = CREW.filter(c => !taken.has(c.id));
+  chooseCrew((pool.length ? pool : CREW)[Math.floor(seed * (pool.length || CREW.length))].id);
 }
 export function goLocal(s: App['local']) { app.local = s; notify(); }
 export function setTab(r: Role) { app.tab = r; notify(); }

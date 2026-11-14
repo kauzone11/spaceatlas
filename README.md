@@ -41,7 +41,8 @@ node scripts/perf.cjs          # first paint, time to usable screen and frame ti
 | `src/engine/codec.ts` | Design <-> share code (URL hash). |
 | `src/engine/guided.ts` | Guided-build question order, answer (choice plus automatic secondary decisions), per-step hint. |
 | `src/i18n/` | English source plus Portuguese and Spanish; tests enforce identical keys and placeholders. |
-| `src/data/` | Generated: NASA textures, portraits, Bennu shape model, data snapshot (`scripts/build_assets.py`). |
+| `src/data/` | Generated: NASA textures, portraits, Bennu shape model, data snapshot (`scripts/build_assets.py`); crew sprite sheets (`sprites.ts`, `scripts/build_crew_sprites.py`). |
+| `art/crew/` | The three playable characters as clean pixel-art sprites (one PNG pixel per art pixel), extracted from the original drawings. |
 | `src/net/room.ts` | Team rooms over the artifact `room` capability; BroadcastChannel stand-in for local tabs. |
 | `src/ui/` | Preact screens, three.js scene, store (host-authoritative shared state), audio. |
 | `src/ui/cine.ts` | Flight films. Smoke and steam are lit, depth-sorted billows; exhaust plumes differ by propellant (kerosene, solid, hydrogen); a solar storm is shown as it is observed (flare, particle tracks on the camera sensor, the plasma cloud, aurora), not as explosions. The launch has selectable cameras. |
@@ -70,7 +71,7 @@ are NASA public-domain media (NASA 3D Resources, Scientific Visualization Studio
 lights/water mask, Mars, the Sun, Mercury, Venus, Jupiter, Saturn (and rings), Uranus and Neptune use Solar System Scope textures
 (https://www.solarsystemscope.com/textures/, CC BY 4.0, based on NASA data); Mars is re-coloured to the NASA Viking mosaic.
 Textures are built by `scripts/build_worlds.py` into `src/data/worlds.ts`. NASA does not endorse this game.
-Crew members are fictional; mentors are real NASA astronauts described with verifiable facts only.
+Crew members are fictional pixel-art characters (Lucas, Sofía, Rin) whose paths are inspired by real NASA astronauts (Franklin Chang-Díaz, Ellen Ochoa, Jessica Watkins); the idle animation (breathing, blinking) is generated from the sprite by `scripts/build_crew_sprites.py`.
 
 ## Performance
 
