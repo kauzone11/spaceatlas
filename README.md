@@ -4,7 +4,7 @@ A mission-design game for the NASA Space Apps Challenge. Sign a mission contract
 launcher and orbit, close the budgets (cost, mass, power, delta-v, data, lifetime), pass a Go/No-Go review, fly the mission through
 real-world situations, and read a debrief that traces every loss to a number.
 
-**Play:** https://spaceatlas-kauzone11s-projects.vercel.app (hosted on Vercel; every push to `main` deploys automatically)
+**Play:** https://spaceatlas-ten.vercel.app (hosted on Vercel; every push to `main` deploys automatically)
 
 - Guided build (default): one question per screen (objective, duration, instruments, orbit, size, power, battery, propulsion, comms, rocket).
   Each answer is explained with the numbers it changed, a hint shows the smallest change that fixes a failing check, and secondary decisions
