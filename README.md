@@ -4,6 +4,8 @@ A mission-design game for the NASA Space Apps Challenge. Sign a mission contract
 launcher and orbit, close the budgets (cost, mass, power, delta-v, data, lifetime), pass a Go/No-Go review, fly the mission through
 real-world situations, and read a debrief that traces every loss to a number.
 
+**Play:** https://spaceatlas-kauzone11s-projects.vercel.app (hosted on Vercel; every push to `main` deploys automatically)
+
 - Guided build (default): one question per screen (objective, duration, instruments, orbit, size, power, battery, propulsion, comms, rocket).
   Each answer is explained with the numbers it changed, a hint shows the smallest change that fixes a failing check, and secondary decisions
   (thermal, computer, redundancy, shielding, radio band, ground network) are settled automatically.
@@ -20,10 +22,10 @@ real-world situations, and read a debrief that traces every loss to a number.
 ```bash
 npm install
 npm test          # physics, sizing model, simulation, translations (vitest)
-npm run build     # dist/index.html + dist/textures/ (web build for any static host, e.g. GitHub Pages: publish the whole dist/ folder)
+npm run build     # dist/index.html + dist/assets/ (hashed JS/CSS) + dist/textures/: the web build, deployed by Vercel (vercel.json)
                   # dist/artifact.html (one-file page for a Claude artifact, standard maps inlined), dist/local.html (web build for local tests)
 npx vite preview --port 4173   # then open http://localhost:4173/local.html
-node scripts/e2e.cjs           # browser play-through of every mission (needs Playwright + Chromium)
+node scripts/e2e.cjs           # browser play-through of every mission (needs Playwright + Chromium; E2E_URL=http://localhost:4173/ tests index.html)
 node scripts/guided-shots.cjs  # screenshots of every guided question and the 3D part explorer
 node scripts/audit-shots.cjs   # every screen at 390 px and 1440 px, flags horizontal overflow and console errors
 node scripts/perf.cjs          # first paint, time to usable screen and frame times per quality tier (add ?q=low|medium|high to force a tier)

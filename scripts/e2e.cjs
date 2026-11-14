@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 // NASA APIs are answered locally (empty lists = the game keeps its snapshot) so runs do not depend on the network or the DEMO_KEY rate limit
 const offline = async (ctx) => { await ctx.route(/api\.nasa\.gov|eonet\.gsfc\.nasa\.gov/, r => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' })); return ctx; };
-const URL = 'http://localhost:4173/local.html', ARGS = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
+const URL = process.env.E2E_URL || 'http://localhost:4173/local.html', ARGS = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 const results = []; const ok = (name, pass, info = '') => { results.push({ name, pass, info }); console.log(pass ? 'PASS' : 'FAIL', name, info); };
 async function play(page, { mission, lang, diff, shots, tag, landerOrbit }) {
   const errs = []; page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); }); page.on('pageerror', e => errs.push('PAGEERR ' + e.message));
