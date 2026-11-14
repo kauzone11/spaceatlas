@@ -1,0 +1,9 @@
+node_modules/
+dist/
+# large source data used only by scripts/build_*.py (outputs are already in public/ and src/data/)
+raw/
+# local screenshots and archives
+shots/
+*.zip
+.vercel
+.DS_Store
