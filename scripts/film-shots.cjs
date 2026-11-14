@@ -9,7 +9,7 @@ const URL = process.env.URL || 'http://localhost:4173/local.html', OUT = process
   const p = await ctx.newPage(); const errs = [];
   p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); }); p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
   await p.goto(URL); await p.waitForTimeout(1200); await p.click('#lang button:has-text("PT")');
-  await p.click('#play-solo'); await p.click('#crew-sofia'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.waitForSelector('#mission-select');
+  await p.click('#play-solo'); await p.click('#crew-sofie'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.waitForSelector('#mission-select');
   if (MIS !== 'leo') { await p.click('#mission-' + MIS); if (await p.$('#unlock-all')) await p.click('#unlock-all'); await p.waitForTimeout(200); }
   await p.click('#mission-select'); await p.waitForSelector('#question');
   for (let k = 0; k < 16 && !(await p.$('#to-review')); k++) {

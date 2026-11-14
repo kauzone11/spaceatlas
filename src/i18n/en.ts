@@ -18,12 +18,12 @@ export const en: Record<string, string> = {
   'perk.sys': '+4% budget', 'perk.sc': 'Structure 6% lighter', 'perk.sci': '+8% science yield', 'perk.ops': '+12% downlink',
 
   // crew
-  'crew.title': 'Choose your astronaut', 'crew.sub': 'Three fictional crew members. Each one\'s path is inspired by a real NASA astronaut.',
+  'crew.title': 'Choose your astronaut', 'crew.sub': 'Four fictional crew members, one per station. Each one\'s path is inspired by a real NASA astronaut.',
   'crew.enter': 'Report for duty',
   'crew.age': 'Age', 'crew.from': 'Home town', 'crew.edu': 'Studied at', 'crew.spec': 'Speciality', 'crew.station': 'Your station', 'crew.perk': 'Bonus',
   'crew.fict': 'Fictional character', 'crew.mentor': 'Inspired by', 'crew.mentorsub': 'Real NASA astronaut', 'crew.photo': 'Photo: NASA',
   'crew.rin.spec': 'Planetary geology and remote sensing',
-  'crew.sofia.spec': 'Systems engineering, cost and risk', 'crew.lucas.spec': 'Propulsion and power systems',
+
 
   // lobby
   'lobby.title': 'Team room', 'lobby.code': 'Room code', 'lobby.share': 'Share this code. Teammates open this page, choose "Play with a team" and enter it.',
@@ -290,8 +290,6 @@ export const en: Record<string, string> = {
   'crew.shared': 'What you have in common',
   'crew.solo': 'Playing solo, you run all four stations yourself. Your bonus applies to the whole mission.',
   'crew.rin.link': 'Like Jessica Watkins, Rin is a geologist who reads other worlds through rover and orbiter data. That puts them at the Science station: which instruments fly and what they return.',
-  'crew.sofia.link': 'Like Ellen Ochoa, who went from optics research to running Johnson Space Center, Sofía sees the whole mission at once. That is the Systems job: cost, margins and risk.',
-  'crew.lucas.link': 'Like Franklin Chang-Díaz, who left home to chase a rocket-engine dream, Lucas builds propulsion hardware. That makes him the Spacecraft lead: power, heat and propulsion.',
   'home.event': 'Made for the NASA Space Apps Challenge',
   'st.todo': 'To fix before launch: {n}',
   'st.warns': 'Tight but allowed: {n}',
@@ -638,4 +636,10 @@ export const en: Record<string, string> = {
   'crew.pick': 'Select a crew member to see their profile.',
   'crew.keys': 'Tip: arrow keys switch between them.',
   'crew.teammate': 'A teammate also picked this astronaut',
+  'crew.jeff.spec': 'Propulsion and power systems',
+  'crew.sofie.spec': 'Systems engineering, cost and risk',
+  'crew.mina.spec': 'Spacecraft communications and mission operations',
+  'crew.jeff.link': 'Like Franklin Chang-Díaz, who left home to chase a rocket-engine dream, Jeff builds propulsion hardware. That makes him the Spacecraft lead: power, heat and propulsion.',
+  'crew.sofie.link': 'Like Ellen Ochoa, who went from optics research to running Johnson Space Center, Sofie sees the whole mission at once. That is the Systems job: cost, margins and risk.',
+  'crew.mina.link': 'Like Christina Koch, an electrical engineer who kept science instruments running at remote stations in Antarctica before spending 328 days on the ISS, Mina keeps the mission talking to Earth. That is the Comms & Ops job: launcher, orbit and the link home.',
 };

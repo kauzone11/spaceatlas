@@ -100,11 +100,11 @@ input[type="text"] { box-shadow: inset 0 0 0 1px var(--edge); }
 /* crew: pixel-art line-up. --px is the size of one art pixel in CSS px; it animates (registered property) so the
    chosen character grows while staying drawn at a whole-number scale once the transition ends. */
 @property --px { syntax: '<number>'; inherits: true; initial-value: 5; }
-.crewwrap { max-width: 1040px; padding-top: 2vh; }
-.crewstage { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px; align-items: center; }
-.lineup { --px: 5; display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 3vw, 36px); min-height: 400px; padding: 24px 8px 4px;
+.crewwrap { max-width: 1120px; padding-top: 2vh; }
+.crewstage { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+.lineup { --px: 5; display: flex; justify-content: center; align-items: flex-end; gap: clamp(2px, 1.2vw, 16px); min-height: 400px; padding: 24px 0 4px;
   background: radial-gradient(48% 30% at 50% 86%, rgba(100, 210, 255, 0.10), transparent); }
-.hero { --px: 5; position: relative; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 6px 6px; border: 0; background: none; cursor: pointer;
+.hero { --px: 5; position: relative; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 2px 6px; border: 0; background: none; cursor: pointer;
   border-radius: 18px; transition: --px 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s, filter 0.4s; -webkit-tap-highlight-color: transparent; }
 .hero.on { --px: 6; }
 .hero.off { --px: 4; opacity: 0.55; filter: saturate(0.55) brightness(0.8); }
@@ -120,13 +120,13 @@ input[type="text"] { box-shadow: inset 0 0 0 1px var(--edge); }
 /* frames: 0 rest · 1 breath in · 2 blink · 3 breath + blink */
 @keyframes idle { 0% { background-position: 0 0; } 24% { background-position: 33.333% 0; } 48% { background-position: 0 0; } 63% { background-position: 66.667% 0; }
   66% { background-position: 0 0; } 76% { background-position: 33.333% 0; } 86% { background-position: 100% 0; } 89% { background-position: 33.333% 0; } 100% { background-position: 0 0; } }
-.hero .pad { width: calc(var(--px) * 26px); height: calc(var(--px) * 4px); margin-top: calc(var(--px) * -2.4px); border-radius: 50%;
+.hero .pad { width: calc((var(--w) + 5) * var(--px) * 1px); height: calc(var(--px) * 4px); margin-top: calc(var(--px) * -2.4px); border-radius: 50%;
   background: radial-gradient(closest-side, hsl(var(--h) 80% 62% / 0.55), hsl(var(--h) 80% 50% / 0.12) 70%, transparent); transition: opacity 0.4s; }
 .hero.on .pad { box-shadow: 0 0 0 1px hsl(var(--h) 90% 70% / 0.55), 0 0 24px hsl(var(--h) 90% 60% / 0.45); animation: padpulse 2.4s ease-in-out infinite; }
 @keyframes padpulse { 50% { box-shadow: 0 0 0 1px hsl(var(--h) 90% 70% / 0.25), 0 0 34px hsl(var(--h) 90% 60% / 0.25); } }
-.hero .tag { margin-top: 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.hero .tag { margin-top: 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.2; max-width: 100%; text-align: center; }
 .hero .tag b { font: 600 15px var(--display); }
-.hero .tag small { font-size: 11.5px; color: var(--ink3); white-space: nowrap; }
+.hero .tag small { font-size: 11.5px; color: var(--ink3); min-height: 2.4em; text-wrap: balance; }
 .hero.on .tag small { color: hsl(var(--h) 90% 72%); }
 .hero:focus-visible { outline-offset: 4px; }
 .profile { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 440px; padding: 24px; border-radius: var(--r); background: var(--glass);
@@ -150,7 +150,7 @@ input[type="text"] { box-shadow: inset 0 0 0 1px var(--edge); }
   @keyframes slidein { from { opacity: 0; transform: translateY(16px); } }
 }
 @media (hover: none) { .crewkeys { display: none; } }
-@media (max-width: 380px) { .hero.on { --px: 4; } .hero.off { --px: 3; } .hero .tag small { font-size: 10.5px; } }
+@media (max-width: 560px) { .lineup { --px: 3; } .hero { --px: 3; } .hero.on { --px: 4; } .hero.off { --px: 3; } .hero .tag b { font-size: 14px; } .hero .tag small { font-size: 10.5px; } }
 @media (prefers-reduced-motion: reduce) { .spr, .hero.on .spr, .hero.on .body, .hero.on .pad { animation: none !important; } }
 
 /* lobby */

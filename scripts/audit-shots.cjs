@@ -21,7 +21,7 @@ const URL = process.env.URL || 'http://localhost:4173/local.html', OUT = process
       }
     };
     await p.goto(URL); await p.waitForTimeout(1500); await p.click(`#lang button:has-text("${LANG}")`); await shot('01home');
-    await p.click('#play-solo'); await p.click('#crew-sofia'); await p.waitForSelector('#crew-name'); await shot('02crew');
+    await p.click('#play-solo'); await p.click('#crew-sofie'); await p.waitForSelector('#crew-name'); await shot('02crew');
     await p.click('#crew-enter'); await p.waitForSelector('#mission-select'); await shot('03missions');
     await p.click('#mission-select'); await p.waitForSelector('#question'); await shot('04objective');
     await p.click('#q-next'); await p.click('#amb-1'); await p.click('#q-next');

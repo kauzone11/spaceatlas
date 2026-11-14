@@ -10,7 +10,7 @@ async function play(page, { mission, lang, diff, shots, tag, landerOrbit }) {
   await page.goto(URL); await page.waitForTimeout(1200);
   await page.click(`#lang button:has-text("${lang.toUpperCase()}")`);
   await shot('1home');
-  await page.click('#play-solo'); await page.click('#crew-sofia'); await page.waitForSelector('#crew-name'); await shot('2crew');
+  await page.click('#play-solo'); await page.click('#crew-sofie'); await page.waitForSelector('#crew-name'); await shot('2crew');
   await page.click('#crew-enter'); await page.waitForSelector('#mission-' + mission);
   await page.click('#mission-' + mission); await page.waitForTimeout(300);
   if (await page.$('#unlock-all')) await page.click('#unlock-all');
@@ -70,7 +70,7 @@ async function play(page, { mission, lang, diff, shots, tag, landerOrbit }) {
     const ctx = await offline(await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })); try { await play(await ctx.newPage(), c); } catch (e) { ok(c.tag, false, String(e).slice(0, 300)); } await ctx.close(); }
   // a bad design, flown over a No-Go, must fail with a traced cause
   { const ctx = await offline(await b.newContext({ viewport: { width: 1440, height: 900 } })); const p = await ctx.newPage(); try {
-    await p.goto(URL); await p.click('#play-solo'); await p.click('#crew-lucas'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.click('#mission-select');
+    await p.goto(URL); await p.click('#play-solo'); await p.click('#crew-jeff'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.click('#mission-select');
     await p.click('#q-next'); await p.click('#q-next'); await p.click('#inst-sar'); await p.click('.qnav li:last-child button'); await p.click('#to-review'); for (const x of await p.$$('[id^="vote-go-"]')) await x.click();
     const blocked = !(await p.isEnabled('#launch')); await p.click('#force');
     for (let i = 0; i < 60 && !(await p.$('#sim-finish')); i++) { if (await p.$('#film-skip')) await p.click('#film-skip').catch(() => {}); const ch = await p.$$('#live-card .choice'); if (ch.length) await ch[0].click(); else if (await p.$('#sim-next')) await p.click('#sim-next'); await p.waitForTimeout(120); }
@@ -81,7 +81,7 @@ async function play(page, { mission, lang, diff, shots, tag, landerOrbit }) {
   } catch (e) { ok('forced launch', false, String(e).slice(0, 300)); } await ctx.close(); }
   // team room: two tabs in one browser context (BroadcastChannel stand-in for the artifact room)
   { const ctx = await offline(await b.newContext({ viewport: { width: 1280, height: 800 } })); const A = await ctx.newPage(), B = await ctx.newPage(); try {
-    for (const p of [A, B]) { await p.goto(URL); await p.click('#play-team'); await p.click(p === A ? '#crew-lucas' : '#crew-rin'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); }
+    for (const p of [A, B]) { await p.goto(URL); await p.click('#play-team'); await p.click(p === A ? '#crew-jeff' : '#crew-rin'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); }
     await A.click('#room-create'); await A.waitForSelector('#room-code-show'); const code = (await A.textContent('#room-code-show')).trim();
     await B.fill('#room-code', code); await B.click('#room-join'); await B.waitForSelector('#room-code-show'); await B.waitForTimeout(2500);
     await A.click('#seat-sys'); await B.waitForSelector('#seat-sc'); await B.click('#seat-sc'); await A.waitForTimeout(800);
@@ -102,7 +102,7 @@ async function play(page, { mission, lang, diff, shots, tag, landerOrbit }) {
   // share code via URL hash
   { const ctx = await offline(await b.newContext({ viewport: { width: 1280, height: 800 } })); const p = await ctx.newPage(); try {
     let code = process.env.SA_CODE;
-    if (!code) { await p.goto(URL); await p.click('#play-solo'); await p.click('#crew-lucas'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.click('#mission-select'); await p.click('.qnav li:last-child button');
+    if (!code) { await p.goto(URL); await p.click('#play-solo'); await p.click('#crew-jeff'); await p.waitForSelector('#crew-name'); await p.click('#crew-enter'); await p.click('#mission-select'); await p.click('.qnav li:last-child button');
       await p.click('#share'); await p.waitForTimeout(300); code = (await p.evaluate(() => location.hash)).slice(1); }
     const q = await ctx.newPage(); await q.goto(URL + '#' + code); await q.waitForSelector('#to-review', { timeout: 5000 }); ok('design link opens the build summary', true, 'code=' + code);
   } catch (e) { ok('design link opens the studio', false, String(e).slice(0, 200)); } await ctx.close(); }

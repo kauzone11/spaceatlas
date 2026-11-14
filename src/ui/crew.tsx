@@ -13,7 +13,7 @@ export function CrewSprite({ id, class: cls }: { id: string; class?: string }) {
   return <span class={cx('spr', cls)} aria-hidden="true" style={`--w:${s.w};--hgt:${s.h};background-image:url(${s.sheet})`} />;
 }
 
-/** Crew selection: three characters on a line-up; the one you pick steps forward and its profile slides in beside it. */
+/** Crew selection: four characters on a line-up; the one you pick steps forward and its profile slides in beside it. */
 export function CrewPicker(p: { solo: boolean; onBack: () => void; onEnter: () => void }) {
   const sel = app.crew, lang = getLang(), mates = app.mode === 'team' ? teammateCrew() : new Set<string>();
   const group = useRef<HTMLDivElement>(null);
@@ -35,7 +35,7 @@ export function CrewPicker(p: { solo: boolean; onBack: () => void; onEnter: () =
     <div class={cx('crewstage', sel && 'picked')}>
       <div class="lineup" role="radiogroup" aria-label={t('crew.title')} ref={group} onKeyDown={onKey}>
         {CREW.map((k, i) => <button type="button" role="radio" id={'crew-' + k.id} aria-checked={sel === k.id}
-          tabIndex={(sel ? sel === k.id : i === 0) ? 0 : -1} style={`--h:${k.hue};--d:${-i * 1.37}s`}
+          tabIndex={(sel ? sel === k.id : i === 0) ? 0 : -1} style={`--h:${k.hue};--d:${-i * 1.37}s;--w:${SPRITE[k.id].w}`}
           class={cx('hero', sel === k.id && 'on', sel && sel !== k.id && 'off')} onClick={() => pick(k.id)}>
           <span class="body"><CrewSprite id={k.id} /></span>
           <span class="pad" aria-hidden="true" />
@@ -45,7 +45,7 @@ export function CrewPicker(p: { solo: boolean; onBack: () => void; onEnter: () =
       {c && m ? <div class="panel profile" key={c.id} style={`--h:${c.hue}`} aria-live="polite">
         <p class="eyebrow">{t('role.' + c.role)}</p>
         <h2 class="h-l" id="crew-name">{c.name}</h2>
-        <p class="mut">{c.pronouns[lang]} · {c.age} · {c.from}</p>
+        <p class="mut">{c.pronouns[lang]}</p>
         <p class="spec">{t(`crew.${c.id}.spec`)}</p>
         <p class="small dim">{c.edu} · {t('crew.fict')}</p>
         <div class="stationbox">
