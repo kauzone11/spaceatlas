@@ -76,6 +76,7 @@ function start() {
   canvas.addEventListener('pointerdown', e => { dragging = { x: e.clientX, y: e.clientY }; });
   addEventListener('pointermove', e => { if (dragging && screen() === 'missions') { scene?.rotate(e.clientX - dragging.x, 0); dragging = { x: e.clientX, y: e.clientY }; } });
   addEventListener('pointerup', () => { dragging = null; });
+  root.textContent = ''; // drop the boot splash painted by the HTML; Preact would keep it beside the app
   render(<App />, root);
   loadLive(notify);
   const open = () => { const code = (location.hash || '').slice(1); if (code && decodeDesign(code) && screen() === 'home') { if (!app.crew) drawCrew(); startSolo(code); } };
