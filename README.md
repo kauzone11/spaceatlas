@@ -1,10 +1,42 @@
 # SpaceAtlas: Mission Control
 
-A mission-design game for the NASA Space Apps Challenge. Sign a mission contract, design the spacecraft and its science payload, choose
-launcher and orbit, close the budgets (cost, mass, power, delta-v, data, lifetime), pass a Go/No-Go review, fly the mission through
-real-world situations, and read a debrief that traces every loss to a number.
+### Design a real space mission. Fly it. Find out exactly why it succeeded or failed.
 
-**Play:** https://spaceatlas-ten.vercel.app (hosted on Vercel; every push to `main` deploys automatically)
+## ▶ **[Play now: spaceatlas-ten.vercel.app](https://spaceatlas-ten.vercel.app/)**
+
+No install, no account. Works on phone and desktop, in English, Portuguese and Spanish. Built for the [NASA International Space Apps Challenge](https://www.spaceappschallenge.org/).
+
+![SpaceAtlas: a 3D Earth, "Play solo" and "Play with a team"](docs/home.jpg)
+
+## What makes it different
+
+- **You are mission control.** Sign a contract, choose the target, build the spacecraft and pick the rocket. Cost, mass, power and science update with every choice, and every choice is explained in plain words.
+- **Real NASA data, real physics.** Today's space weather and asteroid close approaches in the briefing; the same first-order sizing rules engineers use in early studies (rocket equation, solar power, battery, link budget, design margins).
+- **A launch worth watching.** Cinematic 3D flights from countdown to orbit, with selectable cameras.
+- **No black boxes.** The debrief traces every lost point to a number, compares your spacecraft with 100–400 other valid designs, and lets you rerun changing one decision.
+- **Play alone or as a crew.** Up to 4 players, each owning a station (Systems & Budget, Spacecraft, Science, Comms & Ops). Empty seats are covered by bots.
+
+![A SpaceAtlas rocket climbing through Max-Q, with the exhaust plume over the Florida coast](docs/launch.jpg)
+
+## How a run goes (about 10 minutes)
+
+1. **Pick a mission:** Earth observation, the Moon's south pole, a real near-Earth asteroid, or Mars.
+2. **Design it:** ten guided questions, from orbit and instruments to power, propulsion, comms and rocket.
+3. **Pass Go/No-Go:** every budget is checked before launch, and the smallest fix is suggested for any failure.
+4. **Fly it:** real-world events arrive (space weather, a stuck solar wing, a lost antenna) and you decide how to respond.
+5. **Read the debrief:** verdict against your own goals and a rerun with one change.
+
+![The rocket in exploded view: fairing, spacecraft, upper stage, interstage and first stage](docs/rocket.jpg)
+
+*Tap any part of the spacecraft or rocket for a plain-language explanation; "Separate parts" opens the exploded view.*
+
+## Built for the challenge
+
+The full loop the challenge asks for in one game: define the objective, design the spacecraft and payload, choose launcher and orbit, balance cost, mass, power, data and lifetime, simulate the result and score it, solo or with a team. Open source, TypeScript, physics engine separate from the UI, automated tests (`npm test`).
+
+NASA does not endorse this project.
+
+## Features
 
 - Guided build (default): one question per screen (objective, duration, instruments, orbit, size, power, battery, propulsion, comms, rocket).
   Each answer is explained with the numbers it changed, a hint shows the smallest change that fixes a failing check, and secondary decisions
