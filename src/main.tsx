@@ -6,10 +6,10 @@ import { SOURCES, MissionId } from './engine/catalog';
 import { SNAPSHOT } from './data/snapshot';
 import { NASA } from './data/nasa';
 import { loadLive } from './net/live';
-import { app, screen, chooseLang, toggleSound, openModal, quit, derived, notify, startSolo, drawCrew } from './ui/store';
+import { app, screen, chooseLang, toggleSound, openModal, quit, derived, notify, startSolo, drawCrew, subscribe, goLocal, act, isHost } from './ui/store';
 import { useApp, Seg, Icon, Btn, cx, eonetTargets } from './ui/common';
 import { Home, CrewDraft, Lobby, Missions, Chat, browseMission } from './ui/screens';
-import { Guided, guidedView } from './ui/guided';
+import { Guided, guidedView, guidedBack } from './ui/guided';
 import { Review, Sim, Report, currentEntry } from './ui/flight';
 import { createScene, Scene3D } from './ui/scene';
 import { decodeDesign } from './engine/codec';
@@ -27,13 +27,16 @@ function syncScene() {
   let phase, lander = false, lost = false;
   if (s === 'sim') { const { r, e, i } = currentEntry(); phase = e?.phase; lander = r.m.orbit.kind === 'lander'; lost = r.lost && i >= r.timeline.length - 1; }
   scene.design(inGame ? d : null);
-  scene.set({ guided: s === 'studio', view: s, mission, phase, lander, lost, show: s === 'studio' ? guidedView() : s === 'sim' && phase === 'launch' ? 'rocket' : 'craft', marker: mission === 'leo' ? { lat: mk.lat, lon: mk.lon } : null });
+  const panel = s === 'missions' ? document.querySelector('.mgrid .panel')?.getBoundingClientRect() : null;
+  scene.set({ free: panel ? panel.right / innerWidth : undefined, guided: s === 'studio', view: s, mission, phase, lander, lost, show: s === 'studio' ? guidedView() : s === 'sim' && phase === 'launch' ? 'rocket' : 'craft', marker: mission === 'leo' ? { lat: mk.lat, lon: mk.lon } : null });
 }
 
 function Credits() {
+  const close = useRef<HTMLButtonElement>(null);
+  useEffect(() => { const back = document.activeElement as HTMLElement | null; close.current?.focus(); return () => back?.focus?.(); }, []);
   return <div class="modal" role="dialog" aria-modal="true" aria-label={t('cr.title')} onClick={e => { if (e.target === e.currentTarget) openModal(null); }}>
     <div class="panel col">
-      <div class="row"><h2 class="h-m">{t('cr.title')}</h2><span style="flex:1" /><button type="button" class="iconbtn" aria-label={t('nav.close')} onClick={() => openModal(null)}><Icon n="x" /></button></div>
+      <div class="row"><h2 class="h-m">{t('cr.title')}</h2><span style="flex:1" /><button type="button" class="iconbtn" ref={close} aria-label={t('nav.close')} onClick={() => openModal(null)}><Icon n="x" /></button></div>
       <p class="mut">{t('cr.data', { date: fmtDate(SNAPSHOT.date) })}</p><p class="mut">{t('cr.nasa', { date: fmtDate(NASA.date) })}</p><p class="mut">{t('cr.model')}</p><p class="mut">{t('cr.assets')}</p>
       <ul class="clean">{SOURCES.map(s => <li><a href={s.url} target="_blank" rel="noreferrer">{s.label}</a></li>)}</ul>
       <p class="dim small">{t('cr.team')}</p>
@@ -79,6 +82,29 @@ function start() {
   root.textContent = ''; // drop the boot splash painted by the HTML; Preact would keep it beside the app
   render(<App />, root);
   loadLive(notify);
+  addEventListener('keydown', e => { if (e.key === 'Escape' && app.modal) openModal(null); });
+  // Browser Back steps back inside the game (previous question, previous screen) instead of leaving the page
+  let armed = false, skip = false;
+  const arm = () => {
+    const home = screen() === 'home';
+    try {
+      if (!home && !armed) { history.pushState({ sa: 1 }, ''); armed = true; }
+      else if (home && armed) { armed = false; skip = true; history.back(); } // back on the title screen: drop our entry so the next Back leaves
+    } catch { /* history unavailable */ }
+  };
+  subscribe(arm);
+  addEventListener('popstate', () => {
+    if (skip) { skip = false; return; }
+    armed = false;
+    const s = screen(), host = app.mode === 'solo' || isHost();
+    if (app.modal) openModal(null);
+    else if (s === 'crew') goLocal('home');
+    else if (s === 'lobby') quit();
+    else if (s === 'missions') { if (app.mode === 'solo') goLocal('crew'); }
+    else if (s === 'studio') { if (!guidedBack() && host) act({ t: 'nav', screen: 'missions' }); }
+    else if (s === 'review') { if (host) act({ t: 'nav', screen: 'studio' }); }
+    arm();
+  });
   const open = () => { const code = (location.hash || '').slice(1); if (code && decodeDesign(code) && screen() === 'home') { if (!app.crew) drawCrew(); startSolo(code); } };
   open(); addEventListener('hashchange', open);
   (window as any).__sa = { app, derived, notify, scene };

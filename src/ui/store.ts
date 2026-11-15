@@ -1,5 +1,5 @@
 // Application state. One serialisable `Shared` object drives the game in solo and in team rooms (host-authoritative).
-import { Design, Field, Role, ROLES, MissionId, Difficulty, FIELD_ROLE, MISSIONS } from '../engine/catalog';
+import { Design, Field, Role, ROLES, MissionId, Difficulty, FIELD_ROLE, MISSIONS, MISSION } from '../engine/catalog';
 import { defaultDesign, setField, evaluate, Metrics, CheckId, assist, autoPropellant } from '../engine/engine';
 import { simulate, Result } from '../engine/sim';
 import { CREW, CREW_BY_ID } from '../data/crew';
@@ -52,7 +52,29 @@ setLang(app.lang);
 const subs = new Set<() => void>();
 export const subscribe = (f: () => void) => { subs.add(f); return () => { subs.delete(f); }; };
 let cache: { key: string; m: Metrics; r: Result } | null = null;
-export function notify() { subs.forEach(f => f()); }
+export function notify() { subs.forEach(f => f()); saveSolo(); }
+// ---------- solo game kept across reloads (a closed tab or a refresh does not lose the spacecraft) ----------
+const SCREENS: Screen[] = ['missions', 'studio', 'review', 'sim', 'report'];
+let lastSaved = '';
+function saveSolo() {
+  if (app.mode !== 'solo' || app.local !== null || !app.crew) return;
+  const s = JSON.stringify({ g: app.g, step: app.step, crew: app.crew });
+  if (s !== lastSaved) { lastSaved = s; save('sa.game', s); }
+}
+/** The solo game saved on this device, if it is past the mission list. */
+export function savedGame(): { g: Shared; step: number; crew: string } | null {
+  try {
+    const v = JSON.parse(loadStr('sa.game') || 'null');
+    if (!v?.g?.design || !MISSION[v.g.design.mission as MissionId] || !SCREENS.includes(v.g.screen) || v.g.screen === 'missions' || !CREW_BY_ID[v.crew]) return null;
+    evaluate(v.g.design); return v;
+  } catch { return null; }
+}
+export function resumeGame() {
+  const v = savedGame(); if (!v) return false;
+  leaveRoom(); app.mode = 'solo'; app.me = 'solo'; app.net = 'off'; app.crew = v.crew;
+  app.g = { ...newShared('solo', 'missions'), ...v.g, host: 'solo' }; app.step = Math.max(0, Math.min(GUIDED.length, Number(v.step) || 0)); app.stepFor = app.g.design.mission + ':' + app.g.design.difficulty;
+  app.local = null; notify(); return true;
+}
 export const screen = () => app.local ?? app.g.screen;
 export const isHost = () => app.g.host === app.me;
 export const myRole = (): Role | null => ROLES.find(r => app.g.seats[r]?.peer === app.me) ?? null;
@@ -79,7 +101,7 @@ export function chooseCrew(id: string) {
   net?.presence({ crew: app.crew });
   notify();
 }
-/** Crew members other players in the room have picked (picks may repeat: there are 3 characters for 4 seats). */
+/** Crew members other players in the room have picked (picks may repeat between players). */
 export const teammateCrew = () => new Set(app.peers.filter(p => !p.isMe).map(p => p.presence.crew as string));
 /** Used when a shared design link skips the crew screen: pick someone not already in the room. */
 export function drawCrew(seed = Math.random()) {

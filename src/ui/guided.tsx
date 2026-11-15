@@ -31,6 +31,12 @@ function previewOf(d: Design, f: Field, v: unknown): Metrics {
   if (!m) { if (preview.size > 300) preview.clear(); m = evaluate(answer(d, f, v, { crew: crewPerks() }), { crew: crewPerks() }); preview.set(k, m); }
   return m;
 }
+/** Browser Back inside the guided build: close the part card, else the previous question. False on the first question. */
+export function guidedBack(): boolean {
+  if (picked) { picked = null; notify(); return true; }
+  if (app.step > 0) { go(app.step - 1); return true; }
+  return false;
+}
 const go = (i: number) => { app.step = Math.max(0, Math.min(N, i)); view = null; picked = null; exploded = false; notify(); document.querySelector('main.screen')?.scrollTo({ top: 0, behavior: 'smooth' }); };
 
 function context(s: Step, d: Design, m: Metrics): string {
@@ -99,7 +105,7 @@ function Feedback({ s, d, m, edit }: { s: Step; d: Design; m: Metrics; edit: boo
 
 /** Put the design code in the address and copy the link, so the same spacecraft can be reopened or sent to someone. */
 function shareDesign(d: Design) {
-  const code = encodeDesign(d); try { location.hash = code; } catch { /* hash not writable */ }
+  const code = encodeDesign(d); try { history.replaceState(history.state, '', '#' + code); } catch { /* address not writable (sandboxed frame) */ }
   const url = (() => { try { return location.href.split('#')[0] + '#' + code; } catch { return code; } })();
   (navigator.clipboard?.writeText(url) ?? Promise.reject()).then(() => toast(t('st.copied')), () => toast(t('st.copyfail', { code })));
 }
@@ -162,6 +168,7 @@ export function Guided({ scene }: { scene: Scene3D | null }) {
   const sel = picked;
   useEffect(() => { scene?.explode(exploded); scene?.focus(sel ?? s?.part ?? null); });
   useEffect(() => () => { scene?.explode(false); scene?.focus(null); }, []);
+  useEffect(() => { const k = (e: KeyboardEvent) => { if (e.key === 'Escape' && picked) { picked = null; refresh(); } }; addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
   const pick = (c: string | null) => { picked = c; refresh(); };
   const v = guidedView(), narrow = useNarrow();
   const meters = <div class="meters four">

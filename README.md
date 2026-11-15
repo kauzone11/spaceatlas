@@ -14,8 +14,9 @@ real-world situations, and read a debrief that traces every loss to a number.
   (https://github.com/fredhlima/sistema-solar-web, CC BY-NC 4.0); no code or assets were copied.
 - 4 missions: Earth observation (LEO), lunar south pole, a real near-Earth asteroid, Mars.
 - 4 stations with asymmetric ownership: Systems & Budget, Spacecraft, Science, Comms & Ops. Solo, or up to 4 players in a room.
+- A solo game is saved on the device: after a reload or a closed tab, the title screen offers to continue where you stopped. The browser Back button steps back inside the game (previous question, previous screen).
 - 3 difficulties, 3 languages (EN, PT, ES), fully 3D (three.js), sounds synthesised in the browser.
-- Result screen in plain words: the verdict against the minimum and full goals, a waterfall of where the science came from (expected, then each flight event, then final), a comparison with ~70 other valid spacecraft for the same mission (value for money = distance to the science-vs-cost Pareto frontier), and a one-change rerun with suggested fixes.
+- Result screen in plain words: the verdict against the minimum and full goals, a waterfall of where the science came from (expected, then each flight event, then final), a comparison with 100–400 other valid spacecraft for the same mission (random designs plus variations one or two decisions away from yours) (value for money = distance to the science-vs-cost Pareto frontier), and a one-change rerun with suggested fixes.
 
 ## Run
 

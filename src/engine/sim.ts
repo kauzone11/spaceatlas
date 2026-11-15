@@ -51,6 +51,16 @@ const DEFS: SitDef[] = [
     vars: c => ({ mass: c.m.launchMass, cap: c.m.cap }), run: c => { c.st.lost = true; return { v: 'lost', tone: 'bad', cause: 'mass' }; } },
   { id: 'licence', phase: 'launch', role: 'sys', kind: 'incident', when: c => fail(c, 'deorbit'),
     vars: c => ({ alt: c.m.orbit.alt ?? 0 }), run: c => { c.st.lost = true; return { v: 'lost', tone: 'bad', cause: 'deorbit' }; } },
+  // launch-day winds are decided on the pad, before liftoff (a random event: drawn only on some flights)
+  { id: 'scrub', phase: 'launch', role: 'ops', kind: 'weather', random: true, when: () => true, opts: [{ id: 'hold' }, { id: 'go' }],
+    run: (c, p) => {
+      if (p === 'hold') {
+        if (c.d.mission === 'mars') { if (margin(c) >= 0.02) { c.st.dv -= 0.02; return { v: 'hold_window', tone: 'neutral' }; } c.st.days *= 0.93; return { v: 'hold_late', tone: 'bad', patch: { propKg: c.d.propKg + 10 } }; }
+        c.st.extraCost += 0.4; return { v: 'hold', tone: 'neutral', vars: { cost: 0.4 } };
+      }
+      if (dice(c, 'scrub') < 0.3) { c.st.mult *= 0.88; return { v: 'go_bad', tone: 'bad' }; }
+      return { v: 'go_ok', tone: 'neutral' };
+    } },
   { id: 'rideorbit', phase: 'launch', role: 'ops', kind: 'incident', when: c => fail(c, 'rideorbit'),
     vars: c => ({ alt: c.m.orbit.alt ?? 0 }), run: c => { c.st.mult *= 0.8; return { v: 'off', tone: 'bad', cause: 'rideorbit' }; } },
   { id: 'liftoff', phase: 'launch', role: 'ops', kind: 'incident', when: c => !c.st.lost,
@@ -221,15 +231,6 @@ const DEFS: SitDef[] = [
     run: c => { c.st.days = Math.min(c.st.days, c.m.lifeYears * 365 - c.m.cruiseDays); return { v: 'fail', tone: 'bad', cause: 'life' }; } },
 
   // ---------------- random events (a different draw every flight; outcomes still depend on the design)
-  { id: 'scrub', phase: 'launch', role: 'ops', kind: 'weather', random: true, when: () => true, opts: [{ id: 'hold' }, { id: 'go' }],
-    run: (c, p) => {
-      if (p === 'hold') {
-        if (c.d.mission === 'mars') { if (margin(c) >= 0.02) { c.st.dv -= 0.02; return { v: 'hold_window', tone: 'neutral' }; } c.st.days *= 0.93; return { v: 'hold_late', tone: 'bad', patch: { propKg: c.d.propKg + 10 } }; }
-        c.st.extraCost += 0.4; return { v: 'hold', tone: 'neutral', vars: { cost: 0.4 } };
-      }
-      if (dice(c, 'scrub') < 0.3) { c.st.mult *= 0.88; return { v: 'go_bad', tone: 'bad' }; }
-      return { v: 'go_ok', tone: 'neutral' };
-    } },
   { id: 'array', phase: 'launch', role: 'sc', kind: 'consequence', random: true, when: c => c.d.power !== 'rtg',
     opts: [{ id: 'shake', when: c => c.d.prop !== 'none' && margin(c) >= 0.003 }, { id: 'accept' }],
     run: (c, p) => {
@@ -429,6 +430,12 @@ export function pareto(base: Design, opts: EvalOpts = {}, n = 1500, seed = 7): P
     const r = complete(d, {}, opts);
     pts.push({ cost: r.cost, sci: r.science });
   }
+  // plus spacecraft one or two decisions away from the base design, so there is always something to compare at the player's price
+  const seen = new Set([JSON.stringify(base)]);
+  const add = (d: Design) => { const k = JSON.stringify(d); if (seen.has(k)) return; seen.add(k); if (failing(evaluate(d, opts)).length) return; const r = complete(d, {}, opts); pts.push({ cost: r.cost, sci: r.science }); };
+  const near = neighbours(base, opts);
+  near.forEach(x => add(x.design));
+  for (let k = 0; k < Math.min(60, n / 8); k++) { const a = pick(near); if (!a) break; const b2 = pick(neighbours(a.design, opts)); if (b2) add(b2.design); }
   const sorted = [...pts].sort((a, b) => a.cost - b.cost || b.sci - a.sci);
   const front: Pareto['front'] = [];
   let best = -1;

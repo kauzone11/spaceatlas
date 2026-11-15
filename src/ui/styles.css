@@ -96,6 +96,7 @@ input[type="text"] { box-shadow: inset 0 0 0 1px var(--edge); }
 .home .sub { font: 500 clamp(20px, 3.4vw, 32px) var(--display); color: var(--ink2); letter-spacing: -0.02em; margin-top: 6px; }
 .feats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin-top: 6px; }
 .feats b { display: block; font-size: 15px; } .feats span { color: var(--ink2); font-size: 13px; }
+.resume { background: var(--glass); border-radius: var(--r2); padding: 14px 16px; box-shadow: inset 0 0 0 1px var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); text-shadow: none; }
 
 /* crew: pixel-art line-up. --px is the size of one art pixel in CSS px; it animates (registered property) so the
    chosen character grows while staying drawn at a whole-number scale once the transition ends. */
@@ -314,6 +315,7 @@ table.diff thead th { border-top: 0; color: var(--ink3); font-size: 12px; font-w
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home { justify-content: flex-start; padding-top: 6vh; }
 }
+@media (max-width: 372px) { .top .steps { display: none; } .top .steps + .right { margin-left: auto; } }
 @media (max-width: 420px) { .seg button { padding: 6px 9px; } .top { gap: 6px; } .top .seg button { padding: 6px 7px; } .top .iconbtn { width: 30px; height: 30px; } .steps li { padding: 5px 8px; font-size: 11.5px; } .brand { font-size: 15px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 .h-l + .lead, .h-l + p { margin-top: 8px; }
@@ -435,7 +437,7 @@ details.more[open] { display: flex; flex-direction: column; gap: 8px; }
 
 /* ---- flight: the film owns the screen; a mission-control HUD sits on top; the decision panel slides in when a call is needed ---- */
 .screen:has(.flight) { padding: 0; overflow: hidden; text-shadow: none; }
-.flight { position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.flight { position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; overflow: clip; }
 .flight:active { cursor: grabbing; }
 .flight::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0) 150px), linear-gradient(0deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0) 190px); }
 .hud-top { position: absolute; top: 14px; left: 22px; right: 440px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 30px; pointer-events: none; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }

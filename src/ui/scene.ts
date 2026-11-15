@@ -11,7 +11,9 @@ import { createEnvs } from './env';
 import { tubeTexture, tubeBump, shellTexture, gridTexture, DECAL_THETA, type TubeLook, type Decal } from './livery';
 
 type V3 = THREE.Vector3;
-export interface ViewSpec { guided?: boolean; view: string; mission: MissionId; phase?: Phase; lander?: boolean; marker?: { lat: number; lon: number } | null; lost?: boolean; show?: 'craft' | 'rocket' }
+export interface ViewSpec { guided?: boolean; view: string; mission: MissionId; phase?: Phase; lander?: boolean; marker?: { lat: number; lon: number } | null; lost?: boolean; show?: 'craft' | 'rocket';
+  /** Fraction of the screen width covered by text on the left; the globe is placed in the free part to the right. */
+  free?: number }
 const v3 = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 const BODY_OF: Record<MissionId, string> = { leo: 'earth', moon: 'moon', neo: 'bennu', mars: 'mars' };
 
@@ -375,7 +377,13 @@ export function createScene(canvas: HTMLCanvasElement): Scene3D {
     switch (s.view) {
       case 'home': b = 'earth'; portrait ? P(0, -4.6, 0, 3.6) : P(3.2, -2.3, 0, 3.9); C(0, 0, 0, 0); break;
       case 'crew': case 'lobby': b = 'earth'; portrait ? P(0, -10.8, -4, 4.5) : P(8.8, -7.4, -4, 4.6); C(0, 0, 0, 0); T.dim = 0.55; break;
-      case 'missions': portrait ? P(0, 2.55, 0, 1.25) : P(2.9, 0.35, 0, 2.35); C(0, 0, 0, 0); break;
+      case 'missions': {
+        if (portrait) { P(0, 2.55, 0, 1.25); C(0, 0, 0, 0); break; }
+        // keep the globe beside the briefing, not under it: centre it in the free space, letting it bleed off the right edge when space is short
+        const vh = 2 * 12 * Math.tan((20 * Math.PI) / 180), vw = vh * cam.aspect, x0 = -vw / 2 + Math.min(0.75, Math.max(0, s.free ?? 0.6)) * vw, avail = vw / 2 - x0, gap = 0.3;
+        const r = Math.min(2.35, Math.max(1.9, avail / 2 - gap));
+        P(x0 + Math.max(r + gap, avail / 2), 0.35, 0, r); C(0, 0, 0, 0); break;
+      }
       case 'contract': portrait ? P(0, 5.6, -6, 2.4) : P(4.6, -0.4, -3, 3.2); C(0, 0, 0, 0); T.dim = 0.8; break;
       case 'studio': if (s.guided) { portrait ? P(7.5, 15.5, -20, 4) : P(11, -8.2, -18, 5.2); portrait ? (s.show === 'rocket' ? C(0, 1.85, 0, 1.15) : C(0, 1.85, 0, 1.55)) : C(2.75, -0.85, 0, 1.9); T.dim = 0.8; break; }
         portrait ? P(3, 6.5, -14, 4) : P(9.5, -6.2, -14, 5); portrait ? (s.show === 'rocket' ? C(0, 1.1, 0, 1.2) : C(0, 1.25, 0, 0.6)) : C(2.5, 0.8, 0, 1.35); T.dim = 0.7; break;

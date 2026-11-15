@@ -642,4 +642,10 @@ export const en: Record<string, string> = {
   'crew.jeff.link': 'Like Franklin Chang-Díaz, who left home to chase a rocket-engine dream, Jeff builds propulsion hardware. That makes him the Spacecraft lead: power, heat and propulsion.',
   'crew.sofie.link': 'Like Ellen Ochoa, who went from optics research to running Johnson Space Center, Sofie sees the whole mission at once. That is the Systems job: cost, margins and risk.',
   'crew.mina.link': 'Like Christina Koch, an electrical engineer who kept science instruments running at remote stations in Antarctica before spending 328 days on the ISS, Mina keeps the mission talking to Earth. That is the Comms & Ops job: launcher, orbit and the link home.',
+  'sim.kind.wx': 'Launch weather',
+  'rp.cheapest': 'None of the other spacecraft cost as little as yours, so there is nothing to compare at your price. The dots to the right show what extra money bought.',
+  'rp.failnote': 'But a cheap spacecraft does not save a mission that misses the minimum goal.',
+  'home.resume': 'Mission in progress: {mission}',
+  'home.resumed': 'You stopped at: {step} · {name}',
+  'home.continue': 'Continue',
 };

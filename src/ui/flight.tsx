@@ -51,7 +51,7 @@ function EntryCard({ e, d, live, last }: { e: Entry; d: Design; live: boolean; l
   if (!live) return <div class={cx('panel card past', e.tone)}><div class="row" style="flex-wrap:nowrap"><span class="tone" /><b>{t(`sit.${e.id}.t`)}</b><span style="flex:1" />{Math.abs(e.delta) >= 0.5 && <span class={cx('small num', e.delta > 0 ? 'up' : 'down')}>{signed(e.delta)} {t('unit.su')}</span>}</div>
     <p class="small mut">{t(`sit.${e.id}.r.${e.v}`, vars)}</p></div>;
   return <div class={cx('panel card col enter soft', e.v ? e.tone : 'live')} id="live-card" data-sit={e.id}>
-    <div class="row"><Chip tone={e.kind === 'opportunity' ? 'ok' : e.kind === 'weather' ? 'warn' : 'info'}>{t('sim.kind.' + e.kind)}</Chip>{e.random && <Chip tone="info">{t('sim.random')}</Chip>}<span class="small mut">{t('sim.phase.' + e.phase)}</span></div>
+    <div class="row"><Chip tone={e.kind === 'opportunity' ? 'ok' : e.kind === 'weather' ? 'warn' : 'info'}>{kindLabel(e)}</Chip>{e.random && <Chip tone="info">{t('sim.random')}</Chip>}<span class="small mut">{t('sim.phase.' + e.phase)}</span></div>
     <h3>{t(`sit.${e.id}.t`)}</h3>
     {e.options.length > 0 && <p class="mut">{t(`sit.${e.id}.b`, vars)}</p>}
     {!e.v ? <div class="choices"><div class="small dim">{can ? t('sim.decide', { role: t('role.' + e.role) }) : t('sim.waiting', { name: roleOwnerName(e.role) })}</div>
@@ -73,7 +73,9 @@ const POST: Record<string, true> = { landing: true, aerobrake: true, nav: true }
 export function filmSpec(r: Result, i: number, d: Design): FilmSpec | null {
   const e = r.timeline[i]; if (!e) return null;
   const ids = new Set(r.timeline.map(x => x.id)), lander = r.m.orbit.kind === 'lander';
-  const ending: Ending = ids.has('licence') ? 'hold' : ids.has('overmass') ? 'short' : ids.has('rideorbit') ? 'offorbit' : 'ok';
+  // launch-day winds: the countdown holds on the pad until the call is made, then the launch is flown
+  const padHold = e.id === 'scrub' && !e.v;
+  const ending: Ending = padHold || ids.has('licence') ? 'hold' : ids.has('overmass') ? 'short' : ids.has('rideorbit') ? 'offorbit' : 'ok';
   const arrive: Arrive = e.id === 'dvshort' ? (r.lost || e.v === 'miss' ? 'miss' : 'orbit') : e.id === 'aerobrake' ? 'aero' : e.id === 'nav' ? 'nav' : e.id === 'landing' || lander ? 'land' : r.m.orbit.kind === 'flyby' ? 'flyby' : 'orbit';
   const FILMED: Film[] = d.mission === 'leo' ? ['launch', 'cruise'] : ['launch', 'cruise', 'arrival'];
   const post = POST[e.id] && e.v ? (e.id === 'aerobrake' ? e.pick ?? 'aero' : 'done') : null;
@@ -84,10 +86,12 @@ export function filmSpec(r: Result, i: number, d: Design): FilmSpec | null {
   if (hold) films.push(e.phase as Film);
   const ride = r.timeline.find(x => x.id === 'rideorbit');
   return {
-    key: `${i}:${e.id}:${post ?? ''}`, films, hold, ops: !own, phase: e.phase, mission: d.mission, ending, arrive, post, fx: FX[e.id] ?? null,
+    key: `${i}:${e.id}:${post ?? ''}${e.id === 'scrub' ? (e.v ? ':go' : ':pad') : ''}`, films, hold, ops: !own, phase: e.phase, mission: d.mission, ending, arrive, post, fx: FX[e.id] ?? null,
     cruiseDays: r.m.cruiseDays, altKm: ride ? 525 : r.m.orbit.alt ?? 0, plannedAltKm: ride ? Number(ride.vars.alt) || 0 : r.m.orbit.alt ?? 0,
   };
 }
+/** Chip label for a situation: launch-day winds are weather on Earth, not space weather. */
+export const kindLabel = (e: Entry) => t(e.id === 'scrub' ? 'sim.kind.wx' : 'sim.kind.' + e.kind);
 const pad2 = (n: number) => String(Math.floor(n)).padStart(2, '0');
 const tclock = (v: number) => { const a = Math.abs(Math.round(v)); return `T${v < 0 ? '−' : '+'} ${pad2(a / 3600)}:${pad2((a % 3600) / 60)}:${pad2(a % 60)}`; };
 const compact = (n: number) => new Intl.NumberFormat(app.lang, { notation: 'compact', maximumFractionDigits: 1 }).format(n);
@@ -156,7 +160,7 @@ export function Sim({ scene }: { scene: Scene3D | null }) {
         <div><dt>{t('film.alt')}</dt><dd class="num" ref={refs.alt} /></div><div><dt>{t('film.vel')}</dt><dd class="num" ref={refs.vel} /></div><div><dt>{t('film.dist')}</dt><dd class="num" ref={refs.dist} /></div>
       </dl>
     </div>
-    {showAlert && <div class={cx('hud-alert', tone, e!.kind === 'weather' && 'blink')} role="alert" id="hud-alert"><Icon n={tone === 'ok' ? 'spark' : 'warn'} /><span><small>{t('sim.kind.' + e!.kind)}</small><b>{t(`sit.${e!.id}.t`)}</b></span></div>}
+    {showAlert && <div class={cx('hud-alert', tone, e!.kind === 'weather' && 'blink')} role="alert" id="hud-alert"><Icon n={tone === 'ok' ? 'spark' : 'warn'} /><span><small>{kindLabel(e!)}</small><b>{t(`sit.${e!.id}.t`)}</b></span></div>}
     <p class="hud-cap" ref={refs.cap as any} aria-live="polite" />
     <div class="hud-bottom">
       <ol class="phases" aria-label={t('sim.title')}>{PHASES.map((p, k) => <li class={cx(k === pi && 'on', k < pi && 'done')} aria-current={k === pi ? 'step' : undefined}>{t('sim.phase.' + p)}</li>)}</ol>
@@ -281,7 +285,9 @@ export function Report() {
   const [par, setPar] = useState<Pareto | null>(null); const [patch, setPatch] = useState<Patch | null>(null); const [field, setField] = useState<Field | ''>(''); const [newly, setNewly] = useState(false);
   useEffect(() => { if (app.mode === 'solo') setNewly(recordResult(r)); (r.verdict === 'fail' ? sfx.bad : sfx.good)();
     const id = setTimeout(() => setPar(pareto(d, { crew: opts.crew }, 500)), 60); return () => clearTimeout(id); }, []);
-  const eff = par ? Math.min(100, (r.science / Math.max(frontierAt(par, r.cost), r.science, 1)) * 100) : null;
+  // efficiency only means something when some sampled spacecraft cost as little as yours
+  const cheaper = !!par && par.points.some(q => q.cost <= r.cost + 1e-9);
+  const eff = par && cheaper ? Math.min(100, (r.science / Math.max(frontierAt(par, r.cost), r.science, 1)) * 100) : null;
   const better = par ? par.points.filter(q => q.cost <= r.cost + 1e-9 && q.sci > r.science * 1.005 + 0.5).length : 0;
   const suggestions = useMemo(() => { const seen = new Set<string>(), out: Patch[] = [];
     for (const x of [...rows].filter(x => x.e?.patch).sort((a, b) => (a.to - a.from) - (b.to - b.from))) { const k = JSON.stringify(x.e!.patch); if (!seen.has(k)) { seen.add(k); out.push(x.e!.patch!); } }
@@ -342,7 +348,7 @@ export function Report() {
       <section class="panel col" aria-labelledby="cmp-t" data-computing={par ? undefined : ''}>
         <div class="row" style="align-items:flex-start;flex-wrap:nowrap"><div style="flex:1;min-width:0"><h2 class="h-m" id="cmp-t">{t('rp.pareto')}</h2>
           <p class="small mut">{par ? t('rp.paretod', { n: par.points.length }) : t('rp.computing')}</p></div>
-          <div class="effbox"><span class="small dim">{t('rp.eff')}</span><b id="rp-eff" class="num">{eff === null ? '…' : fmt(eff, 0) + '%'}</b></div></div>
+          <div class="effbox"><span class="small dim">{t('rp.eff')}</span><b id="rp-eff" class="num">{!par ? '…' : eff === null ? '–' : fmt(eff, 0) + '%'}</b></div></div>
         {par && <>
           <ul class="legend">
             <li><span class="sw me" />{t('rp.lg.you')}</li>
@@ -350,7 +356,7 @@ export function Report() {
             <li><span class="sw pt" />{t('rp.lg.other')}</li>
           </ul>
           <Compare p={par} you={{ cost: r.cost, sci: r.science }} m={r.m} />
-          <p class="insight">{better === 0 ? t('rp.better0') : better === 1 ? t('rp.better1') : t('rp.betterN', { n: better })} {eff !== null && t('rp.effd', { pct: Math.round(eff) })}</p>
+          <p class="insight">{!cheaper ? t('rp.cheapest') : better === 0 ? t('rp.better0') : better === 1 ? t('rp.better1') : t('rp.betterN', { n: better })} {eff !== null && t('rp.effd', { pct: Math.round(eff) })} {r.verdict === 'fail' && better === 0 ? t('rp.failnote') : ''}</p>
         </>}
       </section>
     </div>

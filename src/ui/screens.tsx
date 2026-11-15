@@ -4,7 +4,7 @@ import { MISSION, MISSIONS, MissionId, Difficulty, ROLES, Role } from '../engine
 import { evaluate, defaultDesign, lightTimeS, solarFlux } from '../engine/engine';
 import { CREW_BY_ID, MENTOR } from '../data/crew';
 import { roomAvailable } from '../net/room';
-import { app, act, goLocal, startSolo, enterRoom, randomCode, isHost, myRole, canEdit, unlocked, unlockAll, sendChat, derived, crewPerks, quit } from './store';
+import { app, act, goLocal, startSolo, savedGame, resumeGame, enterRoom, randomCode, isHost, myRole, canEdit, unlocked, unlockAll, sendChat, derived, crewPerks, quit } from './store';
 import { Btn, Seg, Chip, Icon, cx, crewName, eonetTargets, neoTarget, objKeyOf, NasaNow } from './common';
 import { decodeDesign } from '../engine/codec';
 import { sfx, startDrone } from './audio';
@@ -19,6 +19,9 @@ export function Home() {
     <div><h1 class="h-xl">{t('app.name')}</h1><div class="sub">{t('app.sub')}</div></div>
     <p class="lead" style="font-size:21px;color:var(--ink)">{t('app.tag')}</p>
     <p class="lead">{t('app.lead')}</p>
+    {(() => { const sv = savedGame(); return sv && <div class="resume panel row" id="resume-box">
+      <span style="flex:1;min-width:0"><b>{t('home.resume', { mission: t(`mis.${sv.g.design.mission}.name`) })}</b><br /><span class="small mut">{t('home.resumed', { step: t('step.' + sv.g.screen), name: crewName(sv.crew) })}</span></span>
+      <Btn id="continue" sound="select" onClick={() => { startDrone(); resumeGame(); }}>{t('home.continue')}</Btn></div>; })()}
     <div class="row">
       <Btn big id="play-solo" sound="select" onClick={() => go('solo')}>{t('home.solo')}</Btn>
       <Btn big id="play-team" kind="ghost" sound="select" onClick={() => go('team')} title={t('home.teamsub')}>{t('home.team')}</Btn>

@@ -620,4 +620,10 @@ export const es: Record<string, string> = {
   'crew.jeff.link': 'Como Franklin Chang-Díaz, que dejó su casa para perseguir el sueño de construir motores de cohete, Jeff desarrolla propulsión. Por eso dirige la Nave: energía, calor y propulsión.',
   'crew.sofie.link': 'Como Ellen Ochoa, que pasó de la investigación en óptica a dirigir el Centro Espacial Johnson, Sofie ve la misión entera. Ese es el trabajo de Sistemas: costo, márgenes y riesgo.',
   'crew.mina.link': 'Como Christina Koch, ingeniera eléctrica que mantuvo instrumentos científicos funcionando en estaciones remotas de la Antártida antes de pasar 328 días en la ISS, Mina mantiene la misión en contacto con la Tierra. Ese es el trabajo de Comunicaciones y Operaciones: lanzador, órbita y el enlace con casa.',
+  'sim.kind.wx': 'Clima en el lanzamiento',
+  'rp.cheapest': 'Ninguna de las otras naves costó tan poco como la tuya, así que no hay con qué comparar a tu precio. Los puntos a la derecha muestran lo que compró el dinero extra.',
+  'rp.failnote': 'Pero una nave barata no salva una misión que queda por debajo de la meta mínima.',
+  'home.resume': 'Misión en curso: {mission}',
+  'home.resumed': 'Te quedaste en: {step} · {name}',
+  'home.continue': 'Continuar',
 };
